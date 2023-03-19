@@ -1,0 +1,171 @@
+//
+// Created on Sun Mar 19 2023
+//
+// The MIT License (MIT)
+// Copyright (c) 2023 xylonx
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+package bragi;
+
+enum Provider {
+    PROVIDER_UNSPECIFIED = 0;
+    PROVIDER_SPOTIFY = 1;
+    PROVIDER_NETEASE_MUSIC = 2;
+    PROVIDER_YOUTUBE = 3;
+    PROVIDER_BILIBILI = 4;
+}
+
+message Image {
+    string url = 1;
+    optional int64 width = 2;
+    optional int64 length = 3;
+}
+
+message Stream {
+    Provider provider = 1;
+    // NOTE(xylonx): maybe it is better to define quality as enum
+    string quality = 2;
+    string base_url = 3;
+    repeated string backup_url = 4;
+}
+
+message UserInfo {
+    string id = 1;
+    Provider provider = 2;
+    string name = 3;
+}
+
+message UserDetail {
+    UserInfo info = 1;
+    optional string description = 2;
+    Image avatar = 3;
+}
+
+message TrackInfo {
+    string id = 1;
+    Provider provider = 2;
+    string name = 3;
+    repeated UserInfo artists = 4;
+    Image cover = 5;
+}
+
+// TrackCollection is the abstract of the Album and Playlist
+message TrackCollection {
+    string id = 1;
+    Provider provider = 2;
+    string name = 3;
+    repeated UserInfo authors = 4;
+    Image cover = 5;
+    repeated TrackInfo tracks = 6;
+}
+
+message TrackCollectionDetail {
+    string id = 1;
+    Provider provider = 2;
+    string name = 3;
+    repeated UserDetail authors = 4;
+    Image cover = 5;
+    repeated TrackInfo tracks = 6;
+    optional string description = 7;
+}
+
+////
+//// before are model define
+////
+
+message SearchSuggestionRequest {
+    // enabled providers. nil means enabling all
+    repeated Provider providers = 1;
+    string keyword = 2;
+}
+message SearchSuggestionReplay {
+    message Suggestion {
+        Provider provider = 1;
+        string suggestion = 2;
+    }
+    repeated Suggestion suggestions = 1;
+}
+
+enum SearchZone {
+    SEARCH_ZONE_UNSPECIFIED = 0;
+    SEARCH_ZONE_TRACK = 1;
+    SEARCH_ZONE_ARTIST = 2;
+    SEARCH_ZONE_ALBUM = 3;
+    SEARCH_ZONE_PLAYLIST = 4;
+}
+
+message SearchRequest {
+    // enabled providers. nil means enabling all
+    repeated Provider providers = 1;
+    string keyword = 2;
+    // page number. inc from 1
+    int32 page = 3;
+    // enabled search fields. nil means enabling all
+    repeated SearchZone fields = 4;
+}
+message SearchReplay {
+    message SearchItem {
+        oneof Item {
+            TrackInfo track = 1;
+            UserDetail user = 2;
+            TrackCollection album = 3;
+            TrackCollection playlist = 4;
+        }
+    }
+    repeated SearchItem items = 1;
+}
+
+message DetailRequest {
+    Provider provider = 1;
+    SearchZone zone = 2;
+    string id = 3;
+}
+message DetailReplay {
+    message DetailItem {
+        oneof Item {
+            TrackInfo track = 1;
+            UserDetail user = 2;
+            TrackCollectionDetail album = 3;
+            TrackCollectionDetail playlist = 4;
+        }
+    }
+    DetailItem items = 1;
+}
+
+message StreamRequest {
+    Provider provider = 1;
+    string id = 2;
+}
+message StreamReplay {
+    repeated Stream audios = 1;
+    repeated Stream videos = 2;
+}
+
+service Bragi {
+    rpc Suggest(SearchSuggestionRequest) returns (SearchSuggestionReplay);
+
+    rpc Search(SearchRequest) returns (SearchReplay);
+
+    rpc Detail(DetailRequest) returns (DetailReplay);
+
+    rpc Stream(StreamRequest) returns (StreamReplay);
+}
