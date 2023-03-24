@@ -92,12 +92,12 @@ message TrackCollectionDetail {
 //// before are model define
 ////
 
-message SearchSuggestionRequest {
+message SuggestRequest {
     // enabled providers. nil means enabling all
     repeated Provider providers = 1;
     string keyword = 2;
 }
-message SearchSuggestionReplay {
+message SuggestReplay {
     message Suggestion {
         Provider provider = 1;
         string suggestion = 2;
@@ -161,7 +161,7 @@ message StreamReplay {
 }
 
 service Bragi {
-    rpc Suggest(SearchSuggestionRequest) returns (SearchSuggestionReplay);
+    rpc Suggest(SuggestRequest) returns (SuggestRequest);
 
     rpc Search(SearchRequest) returns (SearchReplay);
 
