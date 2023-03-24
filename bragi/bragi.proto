@@ -161,7 +161,7 @@ message StreamReplay {
 }
 
 service Bragi {
-    rpc Suggest(SuggestRequest) returns (SuggestRequest);
+    rpc Suggest(SuggestRequest) returns (SuggestReplay);
 
     rpc Search(SearchRequest) returns (SearchReplay);
 
