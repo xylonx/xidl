@@ -75,7 +75,7 @@ message TrackCollection {
     string name = 3;
     repeated UserInfo authors = 4;
     Image cover = 5;
-    repeated TrackInfo tracks = 6;
+    // repeated TrackInfo tracks = 6; // remove this
 }
 
 message TrackCollectionDetail {
@@ -140,15 +140,12 @@ message DetailRequest {
     string id = 3;
 }
 message DetailReplay {
-    message DetailItem {
-        oneof Item {
-            TrackInfo track = 1;
-            UserDetail user = 2;
-            TrackCollectionDetail album = 3;
-            TrackCollectionDetail playlist = 4;
-        }
+    oneof Item {
+        TrackInfo track = 1;
+        UserDetail user = 2;
+        TrackCollectionDetail album = 3;
+        TrackCollectionDetail playlist = 4;
     }
-    DetailItem items = 1;
 }
 
 message StreamRequest {
