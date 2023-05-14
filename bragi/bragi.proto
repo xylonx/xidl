@@ -132,9 +132,12 @@ message DetailRequest {
 }
 
 message DetailReply {
-    oneof Item {
-        PlaylistDetail playlist = 1;
+    message DetailItem {
+        oneof Item {
+            PlaylistDetail playlist = 1;
+        }
     }
+    DetailItem item = 1;
 }
 
 message StreamRequest {
@@ -142,8 +145,11 @@ message StreamRequest {
     string id = 2;
 }
 message StreamReply {
-    repeated Stream audios = 1;
-    repeated Stream videos = 2;
+    message StreamItem {
+        Stream audio = 1;
+        optional Stream video = 2;
+    }
+    repeated StreamItem streams = 1;
 }
 
 service BragiService {
