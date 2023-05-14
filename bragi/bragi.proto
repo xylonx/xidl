@@ -95,7 +95,7 @@ message SuggestRequest {
     string keyword = 2;
 }
 
-message SuggestReply {
+message SuggestResponse {
     message Suggestion {
         Provider provider = 1;
         string suggestion = 2;
@@ -112,9 +112,9 @@ message SearchRequest {
     repeated Zone fields = 4;
 }
 
-message SearchReply {
+message SearchResponse {
     message SearchItem {
-        oneof Item {
+        oneof item {
             Track track = 1;
             ArtistDetail user = 2;
             Playlist playlist = 3;
@@ -131,9 +131,9 @@ message DetailRequest {
     int32 page = 4;
 }
 
-message DetailReply {
+message DetailResponse {
     message DetailItem {
-        oneof Item {
+        oneof item {
             PlaylistDetail playlist = 1;
         }
     }
@@ -144,7 +144,7 @@ message StreamRequest {
     Provider provider = 1;
     string id = 2;
 }
-message StreamReply {
+message StreamResponse {
     message StreamItem {
         Stream audio = 1;
         optional Stream video = 2;
@@ -153,11 +153,11 @@ message StreamReply {
 }
 
 service BragiService {
-    rpc Suggest(SuggestRequest) returns (SuggestReply);
+    rpc Suggest(SuggestRequest) returns (SuggestResponse);
 
-    rpc Search(SearchRequest) returns (SearchReply);
+    rpc Search(SearchRequest) returns (SearchResponse);
 
-    rpc Detail(DetailRequest) returns (DetailReply);
+    rpc Detail(DetailRequest) returns (DetailResponse);
 
-    rpc Stream(StreamRequest) returns (StreamReply);
+    rpc Stream(StreamRequest) returns (StreamResponse);
 }
