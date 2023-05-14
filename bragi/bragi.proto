@@ -34,70 +34,68 @@ enum Provider {
     PROVIDER_BILIBILI = 4;
 }
 
+enum Zone {
+    ZONE_UNSPECIFIED = 0;
+    ZONE_TRACK = 1;
+    ZONE_ARTIST = 2;
+    ZONE_PLAYLIST = 3;
+}
+
 message Image {
     string url = 1;
     optional int64 width = 2;
     optional int64 length = 3;
 }
 
-message Stream {
-    Provider provider = 1;
-    // NOTE(xylonx): maybe it is better to define quality as enum
-    string quality = 2;
-    string base_url = 3;
-    repeated string backup_url = 4;
-}
-
-message UserInfo {
+message Artist {
     string id = 1;
     Provider provider = 2;
     string name = 3;
 }
 
-message UserDetail {
-    UserInfo info = 1;
+message ArtistDetail {
+    Artist artist = 1;
     optional string description = 2;
     Image avatar = 3;
 }
 
-message TrackInfo {
+message Track {
     string id = 1;
     Provider provider = 2;
     string name = 3;
-    repeated UserInfo artists = 4;
+    repeated Artist artists = 4;
     Image cover = 5;
 }
 
-// TrackCollection is the abstract of the Album and Playlist
-message TrackCollection {
+message Playlist {
     string id = 1;
     Provider provider = 2;
     string name = 3;
-    repeated UserInfo authors = 4;
+    repeated Artist artists = 4;
     Image cover = 5;
-    // repeated TrackInfo tracks = 6; // remove this
 }
 
-message TrackCollectionDetail {
-    string id = 1;
-    Provider provider = 2;
-    string name = 3;
-    repeated UserDetail authors = 4;
-    Image cover = 5;
-    repeated TrackInfo tracks = 6;
-    optional string description = 7;
+message PlaylistDetail {
+    Playlist playlist = 1;
+    optional string description = 2;
+    repeated Track tracks = 3;
 }
 
-////
-//// before are model define
-////
+///
+
+message Stream {
+    Provider provider = 1;
+    // NOTE(xylonx): maybe it is better to define quality as enum
+    string quality = 2;
+    string url = 3;
+}
 
 message SuggestRequest {
-    // enabled providers. nil means enabling all
     repeated Provider providers = 1;
     string keyword = 2;
 }
-message SuggestReplay {
+
+message SuggestReply {
     message Suggestion {
         Provider provider = 1;
         string suggestion = 2;
@@ -105,30 +103,21 @@ message SuggestReplay {
     repeated Suggestion suggestions = 1;
 }
 
-enum SearchZone {
-    SEARCH_ZONE_UNSPECIFIED = 0;
-    SEARCH_ZONE_TRACK = 1;
-    SEARCH_ZONE_ARTIST = 2;
-    SEARCH_ZONE_ALBUM = 3;
-    SEARCH_ZONE_PLAYLIST = 4;
-}
-
 message SearchRequest {
-    // enabled providers. nil means enabling all
     repeated Provider providers = 1;
     string keyword = 2;
     // page number. inc from 1
     int32 page = 3;
     // enabled search fields. nil means enabling all
-    repeated SearchZone fields = 4;
+    repeated Zone fields = 4;
 }
-message SearchReplay {
+
+message SearchReply {
     message SearchItem {
         oneof Item {
-            TrackInfo track = 1;
-            UserDetail user = 2;
-            TrackCollection album = 3;
-            TrackCollection playlist = 4;
+            Track track = 1;
+            ArtistDetail user = 2;
+            Playlist playlist = 3;
         }
     }
     repeated SearchItem items = 1;
@@ -136,15 +125,15 @@ message SearchReplay {
 
 message DetailRequest {
     Provider provider = 1;
-    SearchZone zone = 2;
+    Zone zone = 2;
     string id = 3;
+    // for playlist with large tracks, paginate to show it
+    int32 page = 4;
 }
-message DetailReplay {
+
+message DetailReply {
     oneof Item {
-        TrackInfo track = 1;
-        UserDetail user = 2;
-        TrackCollectionDetail album = 3;
-        TrackCollectionDetail playlist = 4;
+        PlaylistDetail playlist = 1;
     }
 }
 
@@ -152,17 +141,17 @@ message StreamRequest {
     Provider provider = 1;
     string id = 2;
 }
-message StreamReplay {
+message StreamReply {
     repeated Stream audios = 1;
     repeated Stream videos = 2;
 }
 
-service Bragi {
-    rpc Suggest(SuggestRequest) returns (SuggestReplay);
+service BragiService {
+    rpc Suggest(SuggestRequest) returns (SuggestReply);
 
-    rpc Search(SearchRequest) returns (SearchReplay);
+    rpc Search(SearchRequest) returns (SearchReply);
 
-    rpc Detail(DetailRequest) returns (DetailReplay);
+    rpc Detail(DetailRequest) returns (DetailReply);
 
-    rpc Stream(StreamRequest) returns (StreamReplay);
+    rpc Stream(StreamRequest) returns (StreamReply);
 }
