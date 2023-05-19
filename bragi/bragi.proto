@@ -19,7 +19,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR DEALINGS IN THE
 // SOFTWARE.
 
 syntax = "proto3";
@@ -76,9 +76,13 @@ message Playlist {
 }
 
 message PlaylistDetail {
-    Playlist playlist = 1;
-    optional string description = 2;
-    repeated Track tracks = 3;
+    string id = 1;
+    Provider provider = 2;
+    string name = 3;
+    repeated ArtistDetail artists = 4;
+    Image cover = 5;
+    optional string description = 6;
+    repeated Track tracks = 7;
 }
 
 ///
